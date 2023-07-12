@@ -1,6 +1,7 @@
 defmodule Rentals.Item do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Rentals.{Category, Repo}
 
   schema "items" do
     field(:name, :string)
@@ -14,5 +15,12 @@ defmodule Rentals.Item do
     struct
     |> cast(params, [:name, :description])
     |> validate_required([:name, :description])
+  end
+
+  def insert_with_assoc(category_name, params) do
+    Repo.get_by(Category, name: category_name)
+    |> Ecto.build_assoc(:items)
+    |> changeset(params)
+    |> Repo.insert()
   end
 end
