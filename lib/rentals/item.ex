@@ -17,8 +17,8 @@ defmodule Rentals.Item do
     |> validate_required([:name, :description])
   end
 
-  def insert_with_assoc(category_name, params) do
-    Repo.get_by(Category, name: category_name)
+  def insert_with_assoc(category_id, params) do
+    Repo.get(Category, category_id)
     |> Ecto.build_assoc(:items)
     |> changeset(params)
     |> Repo.insert()
