@@ -5,5 +5,6 @@ defmodule Rentals.Item do
     field(:name, :string)
     field(:description, :string)
     belongs_to(:categories, Rentals.Category)
+    timestamps()
   end
 end

@@ -7,5 +7,6 @@ defmodule Rentals.Rental do
     field(:total_amount, :decimal)
     field(:user_id, :integer)
     belongs_to(:items, Rentals.Item)
+    timestamps()
   end
 end
