@@ -15,18 +15,23 @@ defmodule Rentals.Rental do
   def changeset(struct, params) do
     struct
     |> cast(params, [:rental_date, :return_date, :total_amount, :user_id])
-    |> validate_required([:rental_date, :return_date, :total_amount])
+    |> validate_required([:user_id, :rental_date, :total_amount])
     |> validate_return_date()
   end
 
   def validate_return_date(changeset) do
-    compare_dates =
-      Date.compare(get_field(changeset, :rental_date), get_field(changeset, :return_date))
+    return_date = get_field(changeset, :return_date)
 
-    if compare_dates == :lt do
-      changeset
+    if return_date do
+      compare_dates =
+        Date.compare(get_field(changeset, :rental_date), return_date)
+
+      case compare_dates do
+        :lt -> changeset
+        _ -> add_error(changeset, :return_date, "can't be before rental date")
+      end
     else
-      add_error(changeset, :return_date, "can't be before rental date")
+      changeset
     end
   end
 
@@ -38,7 +43,12 @@ defmodule Rentals.Rental do
 
     Ecto.build_assoc(item, :rentals, rental_struct)
     |> changeset(params)
-    |> IO.inspect()
     |> Repo.insert()
+  end
+
+  def return_rental(rental) do
+    rental
+    |> changeset(%{return_date: Date.utc_today()})
+    |> Repo.update()
   end
 end
