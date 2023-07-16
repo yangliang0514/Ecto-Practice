@@ -29,8 +29,8 @@ defmodule Rentals.Rental do
         Date.compare(get_field(changeset, :rental_date), return_date)
 
       case compare_dates do
-        :lt -> changeset
-        _ -> add_error(changeset, :return_date, "can't be before rental date")
+        :gt -> add_error(changeset, :return_date, "can't be before rental date")
+        _ -> changeset
       end
     else
       changeset
