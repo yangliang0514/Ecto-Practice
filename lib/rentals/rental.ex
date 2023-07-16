@@ -7,15 +7,17 @@ defmodule Rentals.Rental do
     field(:rental_date, :date)
     field(:return_date, :date)
     field(:total_amount, :decimal)
-    belongs_to(:item, Rentals.Item)
-    belongs_to(:user, Rentals.User)
+    belongs_to(:item, Item)
+    belongs_to(:user, User)
     timestamps()
   end
 
   def changeset(struct, params) do
     struct
-    |> cast(params, [:rental_date, :return_date, :total_amount, :user_id])
-    |> validate_required([:user_id, :rental_date, :total_amount])
+    |> cast(params, [:rental_date, :return_date, :total_amount, :user_id, :item_id])
+    |> validate_required([:user_id, :item_id, :rental_date, :total_amount])
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:item_id)
     |> validate_return_date()
   end
 
@@ -33,17 +35,6 @@ defmodule Rentals.Rental do
     else
       changeset
     end
-  end
-
-  def create_rental(user_id, item_id, params) do
-    user = Repo.get(User, user_id)
-    item = Repo.get(Item, item_id)
-
-    rental_struct = Ecto.build_assoc(user, :rentals)
-
-    Ecto.build_assoc(item, :rentals, rental_struct)
-    |> changeset(params)
-    |> Repo.insert()
   end
 
   def return_rental(rental) do
